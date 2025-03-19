@@ -19,12 +19,19 @@ public partial class MainWindow : Window
     // table adapter
     NorthwindDataSetTableAdapters.ProductsTableAdapter adpProducts = new NorthwindDataSetTableAdapters.ProductsTableAdapter();
 
+    NorthwindDataSetTableAdapters.CategoriesTableAdapter adpCategories = new NorthwindDataSetTableAdapters.CategoriesTableAdapter();
+
+    NorthwindDataSetTableAdapters.ProdsByCatIdsTableAdapter adpProdsCats = new NorthwindDataSetTableAdapters.ProdsByCatIdsTableAdapter();
+
     // data table
     NorthwindDataSet.ProductsDataTable tblProducts = new NorthwindDataSet.ProductsDataTable();
+    NorthwindDataSet.CategoriesDataTable tblCategories = new NorthwindDataSet.CategoriesDataTable();
+    NorthwindDataSet.ProdsByCatIdsDataTable tblProdsCats = new NorthwindDataSet.ProdsByCatIdsDataTable();
 
     public MainWindow()
     {
         InitializeComponent();
+        LoadComboboxWithCategories();
     }
 
     private void GetAllProducts()
@@ -36,6 +43,14 @@ public partial class MainWindow : Window
         tblProducts = adpProducts.GetProducts();
 
         grdProducts.ItemsSource = tblProducts;
+    }
+
+    private void LoadComboboxWithCategories()
+    {
+        tblCategories = adpCategories.GetCategories();
+        cmbCategories.ItemsSource = tblCategories;
+        cmbCategories.DisplayMemberPath = "CategoryName";
+        cmbCategories.SelectedValuePath = "CategoryID";
     }
 
     private void btnLoadAllProducts_Click(object sender, RoutedEventArgs e)
@@ -94,5 +109,21 @@ public partial class MainWindow : Window
 
         GetAllProducts();
         MessageBox.Show("Product deleted");
+    }
+
+    private void btnSearch_Click(object sender, RoutedEventArgs e)
+    {
+        tblProducts = adpProducts.GetProductsByName(txtName.Text);
+        grdProducts.ItemsSource = tblProducts;
+    }
+
+    private void cmbCategories_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (cmbCategories.SelectedItem != null)
+        {
+            int catId = (int)cmbCategories.SelectedValue;
+            tblProdsCats = adpProdsCats.GetProductsByCatId(catId);
+            grdProducts.ItemsSource = tblProdsCats;
+        }
     }
 }
